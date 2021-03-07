@@ -1,6 +1,27 @@
-import React,{useState} from 'react'
+import React,{useState,useContext,useEffect} from 'react'
+import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
- const Register = () => {
+
+ const Register = props => {
+    const alertContext = useContext(AlertContext);
+    const authContext = useContext(AuthContext);
+
+    const {register ,error,clearErrors,isAuthenticated} = authContext;
+
+    const {setAlert} = alertContext;
+
+    useEffect(()=>{
+      if(isAuthenticated){
+        props.history.push('/')
+      }
+      if(error==='User already exists'){
+        setAlert(error,'danger')
+        clearErrors();
+      }
+      // eslint-disable-next-line
+    },[error,isAuthenticated,props.history])
+
     const [user,setUser] = useState({
         name :'',
         email:'',
@@ -16,7 +37,17 @@ import React,{useState} from 'react'
 
     const onSubmit = e => {
         e.preventDefault();
-        console.log('Register Submit')
+        if(name===''||email === '' === password ===''){
+          setAlert('Please Enter all filds','danger')
+        }else if(password!== password2){
+          setAlert('Passwords do not match','danger')
+
+        }
+        else{
+          register({
+            name,email,password
+          })
+        }
     }
 
     return (
@@ -33,7 +64,6 @@ import React,{useState} from 'react'
             name='name'
             value={name}
             onChange={onChange}
-            required
           />
         </div>
         <div className='form-group'>
@@ -44,7 +74,6 @@ import React,{useState} from 'react'
             name='email'
             value={email}
             onChange={onChange}
-            required
           />
         </div>
         <div className='form-group'>
@@ -55,7 +84,6 @@ import React,{useState} from 'react'
             name='password'
             value={password}
             onChange={onChange}
-            required
             minLength='6'
           />
         </div>
@@ -67,7 +95,6 @@ import React,{useState} from 'react'
             name='password2'
             value={password2}
             onChange={onChange}
-            required
             minLength='6'
           />
         </div>
